@@ -48,8 +48,6 @@ router.post("/", (req, res) => {
   if (!newCar.mileage) {
     return res.status(404).json({ message: "Please add mileage of car" });
   }
-
-  console.log(newCar);
   db("cars")
     .insert(newCar, "id")
     .then(count => {
@@ -60,4 +58,38 @@ router.post("/", (req, res) => {
     });
 });
 
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+  db("cars")
+    .where({ id: id })
+    .del()
+    .then(count => {
+      if (count) {
+        res.status(200).json({ message: " Car has been deleted" });
+      } else {
+        res.status(404).json({ message: "Car does not exist" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Unable to delete from database" });
+    });
+});
+
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+  db("cars")
+    .where({ id: id })
+    .update(changes)
+    .then(count => {
+      if (count) {
+        res.status(200).json(count);
+      } else {
+        res.status(500).json({ message: " Car not found" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Unable to update car in database" });
+    });
+});
 module.exports = router;
